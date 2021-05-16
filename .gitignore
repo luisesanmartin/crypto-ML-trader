@@ -1,2 +1,5 @@
 classifiers/*
-!*/**/*.md
+data/*
+*/**/__pycache__/*
+
+!/**/*.md

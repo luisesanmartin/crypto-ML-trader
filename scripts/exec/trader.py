@@ -10,9 +10,7 @@ import trading_utils as trading
 import feature_engineering_utils as feu
 
 # Parameters
-model_design = 'brute-force'
-model_type = 'xgb'
-model_month = 'apr2021'
+model_used = 'apr2021xgb'
 crypto = 'BTC'
 amount = 10
 time_delta = 1 # in hours
@@ -24,7 +22,7 @@ hold = 0
 profits_total = 0
 
 # Loading model
-model_file = '../../classifiers/' + model_design + '/' + model_month + model_type + '.txt'
+model_file = '../../classifiers/' + model_used + '.txt'
 with open(model_file, 'rb') as f:
     model = pickle.load(f)
 
@@ -41,7 +39,7 @@ price_cols = [
 ]
 
 # Parameters to standardize
-mean_sd_file = '../../data/working/train/X/' + model_design + '/' + model_month + 'mean_sd.txt'
+mean_sd_file = '../../data/mean and std/' + model_used + '_mean_sd.txt'
 with open(mean_sd_file, 'rb') as f:
     mean_sd_list = pickle.load(f)
 
