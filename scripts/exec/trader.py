@@ -10,7 +10,8 @@ import trading_utils as trading
 import feature_engineering_utils as feu
 
 # Parameters
-model_used = 'apr2021xgb'
+model_used = 'xgb'
+month = 'apr2021'
 crypto = 'BTC'
 amount = 10
 time_delta = 1 # in hours
@@ -22,7 +23,7 @@ hold = 0
 profits_total = 0
 
 # Loading model
-model_file = '../../classifiers/' + model_used + '.txt'
+model_file = '../../classifiers/' + month + model_used + '.txt'
 with open(model_file, 'rb') as f:
     model = pickle.load(f)
 
@@ -39,7 +40,7 @@ price_cols = [
 ]
 
 # Parameters to standardize
-mean_sd_file = '../../data/mean and std/' + model_used + '_mean_sd.txt'
+mean_sd_file = '../../data/mean and std/' + month + 'mean_sd.txt'
 with open(mean_sd_file, 'rb') as f:
     mean_sd_list = pickle.load(f)
 
@@ -52,6 +53,9 @@ while True:
     data = dfu.get_data_time_delta(crypto, time_delta=time_delta)
     df = feu.arrange_deployment_data(data, price_cols, frequency_dataset, time_delta)
     df_std = feu.standardize_df(df, stats=mean_sd_list).drop(columns=['time'])
+    current_price = data[-1]['price_close']
+    print('Current ' + crypto + ' price: ' + str(current_price))
+
 
     # Prediction
     prediction = model.predict(df_std)[0]
@@ -60,10 +64,14 @@ while True:
     if hold == 0:
         print('Currently not holding '+crypto)
         if prediction == 1:
-            buy_order = trading.buy_crypto(crypto=crypto, usd_amount=amount)
+            #buy_order = trading.buy_crypto(crypto=crypto, usd_amount=amount)
+            buy_order = trading.buy_crypto_limit(crypto=crypto,
+                                                 usd_amount=amount,
+                                                 limit_price=current_price)
             crypto_quantity = buy_order['quantity']
             amount_spent = float(crypto_quantity) * float(buy_order['price'])
-            print('Sent an order to buy '+crypto_quantity+' for $'+str(round(amount_spent, 2)))
+            order_type = buy_order['type']
+            print('Sent a '+order_type+' order to buy '+crypto_quantity+' for $'+str(round(amount_spent, 2)))
             hold = 1
         else: #prediction == 0
             print('Price is predicted to decrease, not buying')
@@ -72,11 +80,15 @@ while True:
     else: #hold == 1
         print('Currently holding '+crypto_quantity+' of '+crypto)
         if prediction == 0:
-            sell_order = trading.sell_crypto(crypto=crypto, crypto_amount=float(crypto_quantity))
+            #sell_order = trading.sell_crypto(crypto=crypto, crypto_amount=float(crypto_quantity))
+            sell_order = trading.sell_crypto_limit(crypto=crypto,
+                                                   crypto_amount=float(crypto_quantity),
+                                                   limit_price=current_price)
             amount_sold = float(crypto_quantity) * float(sell_order['price'])
             profits = amount_sold - amount_spent
             profits_total += profits
-            print('Sent an order to sell '+crypto_quantity+' for $'+str(round(amount_sold, 2)))
+            order_type = sell_order['type']
+            print('Sent a '+order_type+' order to sell '+crypto_quantity+' for $'+str(round(amount_sold, 2)))
             print('Profits with this operation: $'+str(round(profits, 2)))
             print('Total profits: $'+str(round(profits_total, 2)))
             hold = 0
