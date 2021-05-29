@@ -1,5 +1,5 @@
-import robin_stocks
-import robin_stocks.robinhood as rh
+import robin_stocks.robinhood as robinhood
+import robin_stocks.robinhood.orders as rh
 import json
 
 def login():
@@ -11,26 +11,46 @@ def login():
     with open('../../data/credentials.json') as f:
         login_info = json.load(f)
 
-    login = rh.login(login_info['username'], login_info['password'])
+    login = robinhood.login(login_info['username'], login_info['password'])
 
     return login
 
-def buy_crypto(crypto='BTC', usd_amount=10):
+def buy_crypto(crypto, usd_amount):
 
     '''
     Buys the specified amount of dollars of crypto
     '''
 
-    order_details = rh.order_buy_crypto_by_price(crypto, usd_amount)
+    order = rh.order_buy_crypto_by_price(crypto, usd_amount)
 
-    return order_details
+    return order
 
-def sell_crypto(crypto='BTC', crypto_amount=0.000001):
+def buy_crypto_limit(crypto, usd_amount, limit_price):
+
+    '''
+    Buys the specified amount of dollars of crypto, with a limit price
+    '''
+
+    order = rh.order_buy_crypto_limit_by_price(crypto, usd_amount, limit_price)
+
+    return order
+
+def sell_crypto(crypto, crypto_amount):
 
     '''
     Sells the specified amount of crypto at the current price
     '''
 
-    order_details =rh.order_sell_crypto_by_quantity(crypto, crypto_amount)
+    order = rh.order_sell_crypto_by_quantity(crypto, crypto_amount)
 
-    return order_details
+    return order
+
+def sell_crypto_limit(crypto, crypto_amount, limit_price):
+
+    '''
+    Sells the specified amount of crypto with a limit price
+    '''
+
+    order = rh.order_sell_crypto_limit(crypto, crypto_amount, limit_price)
+
+    return order
