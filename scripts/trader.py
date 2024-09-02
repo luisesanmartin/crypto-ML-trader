@@ -30,8 +30,7 @@ def main():
 		minutes, seconds = time_utils.minute_seconds_now()
 		if minutes % 9 == 0 and seconds >= 58: # 9m, >=58s
 			time_now = time_utils.time_in_string(datetime.now())
-			print("Yes! It's {}".format(time_now))
-			print('Starting now...')
+			print('\nStarting now...')
 			
 			# Data
 			data = fetch_utils.get_data_min()
@@ -40,7 +39,6 @@ def main():
 			current_price = data[0]['price_close']
 
 			# Prediction
-			X = data_utils.make_x(data_dic)
 			prediction = data_utils.prediction_from_net(X, model)
 
 			# Trader in action

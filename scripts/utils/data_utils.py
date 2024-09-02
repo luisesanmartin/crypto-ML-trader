@@ -148,7 +148,7 @@ def make_x(data_dic):
 
 	# ID variable: end time of period
 	times = list(data_dic.keys())[0:1]
-	print('Estimating features for: {}'.format(times[0]))
+	print('Estimating predicitive features for: {}'.format(times[0]))
 
 	# Price increased in this observation
 	inc_price = [price_increased_next(data_dic, time, 0) for time in times]
